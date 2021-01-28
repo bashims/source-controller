@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v2
+package git2go
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/blang/semver/v4"
-	git2go "github.com/libgit2/git2go/v31"
+	extgit2go "github.com/libgit2/git2go/v31"
 
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta1"
 	"github.com/fluxcd/source-controller/pkg/git/common"
@@ -53,10 +53,10 @@ type CheckoutBranch struct {
 }
 
 func (c *CheckoutBranch) Checkout(ctx context.Context, path, url string, auth *common.Auth) (common.Commit, string, error) {
-	repo, err := git2go.Clone(url, path, &git2go.CloneOptions{
-		FetchOptions: &git2go.FetchOptions{
-			DownloadTags: git2go.DownloadTagsNone,
-			RemoteCallbacks: git2go.RemoteCallbacks{
+	repo, err := extgit2go.Clone(url, path, &extgit2go.CloneOptions{
+		FetchOptions: &extgit2go.FetchOptions{
+			DownloadTags: extgit2go.DownloadTagsNone,
+			RemoteCallbacks: extgit2go.RemoteCallbacks{
 				CredentialsCallback:      auth.CredCallback,
 				CertificateCheckCallback: auth.CertCallback,
 			},
@@ -82,10 +82,10 @@ type CheckoutTag struct {
 }
 
 func (c *CheckoutTag) Checkout(ctx context.Context, path, url string, auth *common.Auth) (common.Commit, string, error) {
-	repo, err := git2go.Clone(url, path, &git2go.CloneOptions{
-		FetchOptions: &git2go.FetchOptions{
-			DownloadTags: git2go.DownloadTagsAll,
-			RemoteCallbacks: git2go.RemoteCallbacks{
+	repo, err := extgit2go.Clone(url, path, &extgit2go.CloneOptions{
+		FetchOptions: &extgit2go.FetchOptions{
+			DownloadTags: extgit2go.DownloadTagsAll,
+			RemoteCallbacks: extgit2go.RemoteCallbacks{
 				CredentialsCallback:      auth.CredCallback,
 				CertificateCheckCallback: auth.CertCallback,
 			},
@@ -119,10 +119,10 @@ type CheckoutCommit struct {
 }
 
 func (c *CheckoutCommit) Checkout(ctx context.Context, path, url string, auth *common.Auth) (common.Commit, string, error) {
-	repo, err := git2go.Clone(url, path, &git2go.CloneOptions{
-		FetchOptions: &git2go.FetchOptions{
-			DownloadTags: git2go.DownloadTagsNone,
-			RemoteCallbacks: git2go.RemoteCallbacks{
+	repo, err := extgit2go.Clone(url, path, &extgit2go.CloneOptions{
+		FetchOptions: &extgit2go.FetchOptions{
+			DownloadTags: extgit2go.DownloadTagsNone,
+			RemoteCallbacks: extgit2go.RemoteCallbacks{
 				CredentialsCallback:      auth.CredCallback,
 				CertificateCheckCallback: auth.CertCallback,
 			},
@@ -132,7 +132,7 @@ func (c *CheckoutCommit) Checkout(ctx context.Context, path, url string, auth *c
 	if err != nil {
 		return nil, "", fmt.Errorf("unable to clone '%s', error: %w", url, err)
 	}
-	oid, err := git2go.NewOid(c.commit)
+	oid, err := extgit2go.NewOid(c.commit)
 	if err != nil {
 		return nil, "", fmt.Errorf("git commit '%s' could not be parsed", c.commit)
 	}
@@ -144,8 +144,8 @@ func (c *CheckoutCommit) Checkout(ctx context.Context, path, url string, auth *c
 	if err != nil {
 		return nil, "", fmt.Errorf("git worktree error: %w", err)
 	}
-	err = repo.CheckoutTree(tree, &git2go.CheckoutOpts{
-		Strategy: git2go.CheckoutForce,
+	err = repo.CheckoutTree(tree, &extgit2go.CheckoutOpts{
+		Strategy: extgit2go.CheckoutForce,
 	})
 	if err != nil {
 		return nil, "", fmt.Errorf("git checkout error: %w", err)
@@ -164,10 +164,10 @@ func (c *CheckoutSemVer) Checkout(ctx context.Context, path, url string, auth *c
 		return nil, "", fmt.Errorf("semver parse range error: %w", err)
 	}
 
-	repo, err := git2go.Clone(url, path, &git2go.CloneOptions{
-		FetchOptions: &git2go.FetchOptions{
-			DownloadTags: git2go.DownloadTagsAll,
-			RemoteCallbacks: git2go.RemoteCallbacks{
+	repo, err := extgit2go.Clone(url, path, &extgit2go.CloneOptions{
+		FetchOptions: &extgit2go.FetchOptions{
+			DownloadTags: extgit2go.DownloadTagsAll,
+			RemoteCallbacks: extgit2go.RemoteCallbacks{
 				CredentialsCallback:      auth.CredCallback,
 				CertificateCheckCallback: auth.CertCallback,
 			},

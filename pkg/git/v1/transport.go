@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -47,6 +48,10 @@ func AuthSecretStrategyForURL(URL string) (common.AuthSecretStrategy, error) {
 type BasicAuth struct{}
 
 func (s *BasicAuth) Method(secret corev1.Secret) (*common.Auth, error) {
+	if _, ok := secret.Data[common.CACert]; ok {
+		return nil, errors.New("go-git HTTP transport does not support custom certificates.")
+	}
+
 	auth := &http.BasicAuth{}
 	if username, ok := secret.Data["username"]; ok {
 		auth.Username = string(username)
@@ -65,6 +70,10 @@ type PublicKeyAuth struct {
 }
 
 func (s *PublicKeyAuth) Method(secret corev1.Secret) (*common.Auth, error) {
+	if _, ok := secret.Data[common.CACert]; ok {
+		return nil, errors.New("go-git SSH transport does not support custom certificates.")
+	}
+
 	identity := secret.Data["identity"]
 	knownHosts := secret.Data["known_hosts"]
 	if len(identity) == 0 || len(knownHosts) == 0 {

@@ -28,6 +28,7 @@ const (
 	DefaultOrigin            = "origin"
 	DefaultBranch            = "master"
 	DefaultPublicKeyAuthUser = "git"
+	CACert                   = "caFile"
 )
 
 type Commit interface {
